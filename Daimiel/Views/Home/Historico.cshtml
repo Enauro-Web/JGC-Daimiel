@@ -1,0 +1,265 @@
+﻿@model IEnumerable<Daimiel.Models.TblLlenadoras>
+@using System.Globalization;
+
+@{
+    ViewData["Title"] = "Historico";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="jumbotron jumbotron-fluid mt-2">
+    <div class="container">
+        <h1 class="display-4">Históricos</h1>
+        <p class="lead">En esta tabla se listan los datos históricos de producciones de llenadoras</p>
+    </div>
+</div>
+
+<!--<p>
+    <a asp-action="Create">Create New</a>
+</p>-->
+
+<div class="container-fluid mt-2">
+    <div class="row">
+        <div class="form-group col-md-3">
+            <select class="form-control" id="cbLlenadora">
+                <option value="">Selecciona Llenadora</option>
+                @foreach (var item in Model)
+                {
+                    <option value="@item.puesto">@item.puesto</option>
+                }
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" value="" id="chIniciado" checked>
+                <label class="form-check-label" for="chIniciado">
+                    Iniciado
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" value="" id="chFinalizado" checked>
+                <label class="form-check-label" for="chFinalizado">
+                    Finalizado
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" value="" id="chConsolidado" checked>
+                <label class="form-check-label" for="chConsolidado">
+                    Consolidado
+                </label>
+            </div>
+        </div>
+        <div class="form-group col-md-3">
+            <nav aria-label="...">
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item active">
+                        <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <table class="table table-striped table-hover" id="tbl">
+        <thead class="thead-dark">
+            <tr>
+                <th>
+                    Orden
+                </th>
+                <th>
+                    Semielaborado
+                </th>
+                <!--<th>
+                    Origen
+                </th>-->
+                <th>
+                    Llenadora
+                </th>
+                <th>
+                    Inicio
+                </th>
+                <th>
+                    Fin
+                </th>
+                <th>
+                    Cantidad
+                </th>
+                <th>
+                    Duración
+                </th>
+                <th>
+                    Estado
+                </th>
+                <!--<th></th>-->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.orden)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.semielaborado)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.puesto)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.fecha_inicio)
+                    </td>
+                    @{
+                        DateTimeFormatInfo datetimeFormat = new CultureInfo("es-ES", false).DateTimeFormat;
+                        if (item.fecha_fin == Convert.ToDateTime("01-01-1900", datetimeFormat))
+                        {
+                            <td>
+                                --
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.fecha_fin)
+                            </td>
+                        }
+                    }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.cantidad)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.duracion)
+                    </td>
+                    @{
+                        if (item.estado == "Iniciado")
+                        {
+                            <td class="table-warning">
+                                @Html.DisplayFor(modelItem => item.estado)
+                            </td>
+                        }
+                        else if (item.estado == "Finalizado")
+                        {
+                            <td class="table-success">
+                                @Html.DisplayFor(modelItem => item.estado)
+                            </td>
+                        }
+                        else if (item.estado == "Consolidado")
+                        {
+                            <td class="table-primary">
+                                @Html.DisplayFor(modelItem => item.estado)
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.estado)
+                            </td>
+                        }
+                    }
+
+                    <!--<td>
+                        @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                        @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    </td>-->
+                </tr>
+            }
+        </tbody>
+    </table>    
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $("#cbLlenadora").change(() => {           
+            prepareAjaxQuery();
+        });
+
+        $("#chIniciado").change(() => {
+            prepareAjaxQuery();
+        });
+
+        $("#chFinalizado").change(() => {
+            prepareAjaxQuery();
+        });
+
+        $("#chConsolidado").change(() => {
+            prepareAjaxQuery();
+        });
+
+    });
+
+    function prepareAjaxQuery() {
+        var oFilter = new Object();
+        var llenadora = $("#cbLlenadora").val();
+        var estadoIniciado = 0;
+        var estadoFinalizado = 0;
+        var estadoConsolidado = 0;
+        if ($("#chIniciado").is(':checked'))
+            estadoIniciado = 1;
+        if ($("#chFinalizado").is(':checked'))
+            estadoFinalizado = 2;
+        if ($("#chConsolidado").is(':checked'))
+            estadoConsolidado = 4;
+        oFilter.llenadora = llenadora;
+        oFilter.estado = estadoIniciado + estadoFinalizado + estadoConsolidado;
+        ajaxFilterQuery('/Home/FiltrarLlenadoras', oFilter);
+    }
+
+    function ajaxFilterQuery(urlToSend, objDato) {
+
+        //debugger;         
+        //console.log(objDato);
+        $.ajax({
+            type: "POST",
+            url: urlToSend,
+            contentType: 'application/json',
+            data: JSON.stringify(objDato),
+            success: function (result) {
+                console.log(result);
+                $("#tbl > tbody").empty();
+                $.each(result, (index, item) => {
+
+                    var fecha_fin = '';
+                    if (item.fecha_fin == '1900-01-01T00:00:00')
+                        fecha_fin = '---';
+                    else
+                        fecha_fin = new Date(item.fecha_fin).toLocaleString('es-ES');
+
+                    var lastColumn = '';
+
+                    if (item.estado == "Iniciado")
+                    {
+                        lastColumn = '<td class="table-warning">Iniciado</td>';
+                    }
+                    else if (item.estado == "Finalizado")
+                    {
+                        lastColumn = '<td class="table-success">Finalizado</td>';
+                    }
+                    else if (item.estado == "Consolidado")
+                    {
+                        lastColumn = '<td class="table-primary">Consolidado</td>';
+                    }
+                    else
+                    {
+                        lastColumn = '<td>Desconocido</td>';
+                    }
+
+                    $("#tbl > tbody:last-child").append($('<tr><td>' + item.orden + '</td><td>' + item.semielaborado + '</td><td>' + item.puesto + '</td><td>' + new Date(item.fecha_inicio).toLocaleString('es-ES') + '</td><td>' + fecha_fin + '</td><td>' + item.cantidad + '</td><td>' + item.duracion + '</td>' + lastColumn + '</tr>'));
+                    //console.log(item.material + " - " + item.semielaborado);
+                    $("#inputSemielaborado").val(item.semielaborado);
+                });
+            },
+            error: function (result) {
+                alert('error');
+            }
+        });
+
+    }
+</script>

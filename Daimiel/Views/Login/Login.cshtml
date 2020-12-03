@@ -1,0 +1,41 @@
+﻿@model Daimiel.Models.Ad_Login
+@{
+    ViewData["Title"] = "Login";    
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card login-logout-tab">
+                <div class="card-header">
+                    <img src="~/lib/img/logo-jgcarrion.png" class="img-fluid rounded mx-auto d-block" alt="JGC Logo" />
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 mx">
+                            <form asp-action="/Login/Login" method="post">
+                                <div class="form-group">
+                                    <label for="usuario">Usuario</label>
+                                    <input type="text" class="form-control" asp-for="Usuario" aria-describedby="emailHelp">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" class="form-control" asp-for="Password" id="password">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
