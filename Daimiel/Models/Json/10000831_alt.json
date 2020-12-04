@@ -1,0 +1,64 @@
+{
+  "results": [
+    {
+      "__metadata": {
+        "id": "http://jgcfioprdapp.jgc.es:8000/sap/opu/odata/sap/ZMES_SRV/PrevisionSet('1989351')",
+        "uri": "http://jgcfioprdapp.jgc.es:8000/sap/opu/odata/sap/ZMES_SRV/PrevisionSet('1989351')",
+        "type": "ZMES_SRV.Prevision"
+      },
+      "NumeroOrden": "1989351",
+      "Codigo": "17755",
+      "Semielaborado": "54191",
+      "Lote": "K050",
+      "Descripcion": "REF.SMOOT.PIÑA-PLAT-COC TESCO PET750MLX6",
+      "DescripcionSemielaborado": "SMOOTHIE PIÑA PLATANO COCO (ALDI)",
+      "Fecha": "20201105",
+      "Cantidad": ""
+    },
+    {
+      "__metadata": {
+        "id": "http://jgcfioprdapp.jgc.es:8000/sap/opu/odata/sap/ZMES_SRV/PrevisionSet('1989351')",
+        "uri": "http://jgcfioprdapp.jgc.es:8000/sap/opu/odata/sap/ZMES_SRV/PrevisionSet('1989351')",
+        "type": "ZMES_SRV.Prevision"
+      },
+      "NumeroOrden": "1987158",
+      "Codigo": "16741",
+      "Semielaborado": "54191",
+      "Lote": "K050",
+      "Descripcion": "SMOOT JUICE CO TROPICAL PET750MLX6PROD2",
+      "DescripcionSemielaborado": "SMOOTHIE PIÑA PLATANO COCO (ALDI)",
+      "Fecha": "20201105",
+      "Cantidad": ""
+    },
+    {
+      "__metadata": {
+        "id": "http://jgcfioprdapp.jgc.es:8000/sap/opu/odata/sap/ZMES_SRV/PrevisionSet('1989351')",
+        "uri": "http://jgcfioprdapp.jgc.es:8000/sap/opu/odata/sap/ZMES_SRV/PrevisionSet('1989351')",
+        "type": "ZMES_SRV.Prevision"
+      },
+      "NumeroOrden": "1987143",
+      "Codigo": "17401",
+      "Semielaborado": "54174",
+      "Lote": "K050",
+      "Descripcion": "SMOOT.JUICECO REVITALISE PET750MLX6PROD",
+      "DescripcionSemielaborado": "SMOOTHIE EXPRIMIDO REVITALISE",
+      "Fecha": "20201105",
+      "Cantidad": ""
+    },
+    {
+      "__metadata": {
+        "id": "http://jgcfioprdapp.jgc.es:8000/sap/opu/odata/sap/ZMES_SRV/PrevisionSet('1989351')",
+        "uri": "http://jgcfioprdapp.jgc.es:8000/sap/opu/odata/sap/ZMES_SRV/PrevisionSet('1989351')",
+        "type": "ZMES_SRV.Prevision"
+      },
+      "NumeroOrden": "1987142",
+      "Codigo": "17833",
+      "Semielaborado": "54174",
+      "Lote": "K050",
+      "Descripcion": "REFRIG.SMOOTH.ASDA ORANGE PET 750ML.X6",
+      "DescripcionSemielaborado": "SMOOTHIE EXPRIMIDO REVITALISE",
+      "Fecha": "20201105",
+      "Cantidad": ""
+    }
+  ]
+}

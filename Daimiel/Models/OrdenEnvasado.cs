@@ -20,5 +20,6 @@ namespace Daimiel.Models
         public float Temperatura_Pasteriz { get; set; }
         public float Temperatura_Llenado { get; set; }
         public DateTime Fecha { get; set; }
+        public string Estado { get; set; }
     }
 }

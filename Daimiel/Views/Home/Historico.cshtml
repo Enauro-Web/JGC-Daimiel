@@ -177,6 +177,24 @@
 <script>
     $(document).ready(function () {
 
+
+        $("#cbLlenadora").on("click", function () {
+            //populate combobox with llenadoras
+            $.ajax({
+                type: "POST",
+                url: "/Home/populateCbLlenadora",
+                contentType: 'application/json',
+                success: function (result) {
+                    $("#cbLlenadora").empty();
+                    var options = '<option value="">Selecciona Llenadora</option>';
+                    $.each(result, (index, item) => {
+                        options += '<option value="' + item.puesto + '">' + item.puesto + '</option>';
+                    });
+                    $("#cbLlenadora").append(options);
+                }
+            });
+        });
+
         $("#cbLlenadora").change(() => {           
             prepareAjaxQuery();
         });
@@ -222,7 +240,7 @@
             contentType: 'application/json',
             data: JSON.stringify(objDato),
             success: function (result) {
-                console.log(result);
+                //console.log(result);
                 $("#tbl > tbody").empty();
                 $.each(result, (index, item) => {
 

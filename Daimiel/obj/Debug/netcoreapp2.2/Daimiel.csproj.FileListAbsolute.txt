@@ -39,5 +39,5 @@ C:\Users\ESORTIZPOSTR\source\repos\JGC\Daimiel\obj\Debug\netcoreapp2.2\Razor\Are
 C:\Users\ESORTIZPOSTR\source\repos\JGC\Daimiel\obj\Debug\netcoreapp2.2\Razor\Views\Shared\_LoginPartial.g.cshtml.cs
 C:\Users\ESORTIZPOSTR\source\repos\JGC\Daimiel\obj\Debug\netcoreapp2.2\Razor\Views\Home\Historico.g.cshtml.cs
 C:\Users\ESORTIZPOSTR\source\repos\JGC\Daimiel\obj\Debug\netcoreapp2.2\Razor\Views\Home\Home.g.cshtml.cs
-C:\Users\ESORTIZPOSTR\source\repos\JGC\Daimiel\obj\Debug\netcoreapp2.2\Daimiel.csprojAssemblyReference.cache
 C:\Users\ESORTIZPOSTR\source\repos\JGC\Daimiel\obj\Debug\netcoreapp2.2\Razor\Views\Schedule\Index.g.cshtml.cs
+C:\Users\ESORTIZPOSTR\source\repos\JGC\Daimiel\obj\Debug\netcoreapp2.2\Daimiel.csprojAssemblyReference.cache

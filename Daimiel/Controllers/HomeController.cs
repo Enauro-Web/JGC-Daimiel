@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Daimiel.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Daimiel.Controllers
 {
@@ -25,7 +26,7 @@ namespace Daimiel.Controllers
         }
         public IActionResult Home()
         {
-            return View();
+            return View();            
         }
 
         public IActionResult Privacy()
@@ -42,6 +43,7 @@ namespace Daimiel.Controllers
         [Authorize]
         public ViewResult Llenadora()
         {
+            parseJSON("45",DateTime.Now);
             var cs = this._config.GetConnectionString("DbConnection");
             db dbContext = new db(cs);
 
@@ -110,6 +112,19 @@ namespace Daimiel.Controllers
 
             return View(llenadoras);
         }
+        [HttpPost]
+        public JsonResult populateCbLlenadora()
+        {
+            var cs = this._config.GetConnectionString("DbConnection");
+            db dbContext = new db(cs);
+
+            List<LlenadorasUsuarios> llenadoras = new List<LlenadorasUsuarios>();
+
+            llenadoras = dbContext.GetLlenadoras(User.Identity.Name);
+
+
+            return new JsonResult(llenadoras);
+        }
         public JsonResult FiltrarLlenadoras([FromBody]FiltroLlenadora filtro)
         {
             List<TblLlenadoras> llenadoras = new List<TblLlenadoras>();
@@ -131,6 +146,44 @@ namespace Daimiel.Controllers
             }
 
             return new JsonResult(llenadoraInfo);
+        }
+
+        public void parseJSON(string llenadora, DateTime fecha)
+        {
+            /*var data = @"{""results"": [{""NumeroOrden"": ""1989351"",""Codigo"": ""17755"",""Semielaborado"": ""54191"",""Lote"": ""K050"",""Descripcion"": ""REF.SMOOT.PIÑA-PLAT-COC TESCO PET750MLX6"",
+                                        ""DescripcionSemielaborado"": ""SMOOTHIE PIÑA PLATANO COCO (ALDI)"",""Fecha"": ""20201105"",""Cantidad"": """"},
+                                        {""NumeroOrden"": ""1987158"",""Codigo"": ""16741"",""Semielaborado"": ""54191"",""Lote"": ""K050"",""Descripcion"": ""SMOOT JUICE CO TROPICAL PET750MLX6PROD2"",
+                                        ""DescripcionSemielaborado"": ""SMOOTHIE PIÑA PLATANO COCO (ALDI)"",""Fecha"": ""20201105"",""Cantidad"": """"}
+                        ]}";*/
+
+            var data = System.IO.File.ReadAllText(@"C:\Users\ESORTIZPOSTR\source\repos\JGC\Daimiel\Models\Json\10000831.json");
+
+            JsonOrdenesRoot jsonOrdenes = JsonConvert.DeserializeObject<JsonOrdenesRoot>(data);           
+
+            List<OrdenEnvasado> ordenes = new List<OrdenEnvasado>();
+
+            ordenes = (from JsonOrden jsonOrden in jsonOrdenes.d.results
+                          select new OrdenEnvasado()
+                          {                              
+                              Puesto = llenadora,
+                              Puesto_Denominacion = "",
+                              Orden = jsonOrden.NumeroOrden == "" ? 0 : Convert.ToInt32(jsonOrden.NumeroOrden),
+                              Material = 0,
+                              ProductoTerminado = jsonOrden.Descripcion,
+                              ProductoTerminado_Denominacion = jsonOrden.Descripcion,
+                              Semielaborado = jsonOrden.Semielaborado == "" ? 0 : Convert.ToInt32(jsonOrden.Semielaborado),
+                              Semielaborado_Descr = jsonOrden.DescripcionSemielaborado,
+                              Grado_Brix_VALOR_TEO = 0,
+                              Temperatura_Pasteriz = 0,
+                              Temperatura_Llenado = 0,
+                              Fecha = fecha
+                          }).ToList();
+
+            db dbContext = new db(_config.GetConnectionString("DbConnection"));
+            dbContext.AddOrdenEnvasado(ordenes);
+
+
+
         }
 
     }

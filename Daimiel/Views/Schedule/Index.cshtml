@@ -1,8 +1,139 @@
-﻿
+﻿@model IEnumerable<Unidad>
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Planificación Envasado</h1>
+<script src="~/js/gijgo.min.js"></script>
+<link href="~/css/gijgo.min.css" rel="stylesheet" />
+
+<div class="jumbotron jumbotron-fluid mt-2">
+    <div class="container">
+        <h1 class="display-4">Planificación Envasado</h1>
+        <p class="lead">En esta tabla se listan las ordenes de envasado generadas por SAP para el turno en curso</p>
+    </div>
+</div>
+
+<div class="container-fluid mt-2">
+    <div class="row">
+        <form class="form-inline">
+            <label class="my-1 mr-2" for="cbLlenadora">Llenadora / Turno</label>
+            <select class="custom-select my-1 mr-sm-2" id="cbLlenadora">
+                <option value="">Selecciona Llenadora</option>
+                @foreach (var item in Model)
+                {
+                    <option value="@item.unidad">@item.unidad</option>
+                }
+            </select>
+
+            <div class="custom-control my-1 mr-sm-2">
+                <input type="datetime" class="form-check-input2" id="inputTurno">
+            </div>
+            <button type="button" class="btn btn-primary my-1" id="btnConsulta">Consulta</button>
+
+        </form>
+
+    </div>
+    <div class="row mt-2">
+        <table class="table table-striped table-hover" id="tbl">
+            <thead class="thead-dark">
+                <tr>
+                    <th>
+                        Orden
+                    </th>
+                    <th>
+                        Llenadora
+                    </th>
+                    <th>
+                        Turno
+                    </th>
+                    <th>
+                        Producto
+                    </th>
+                    <th>
+                        Semielaborado
+                    </th>
+                    <th>
+                        Descripción Semielaborado
+                    </th>
+                    <th>
+                        Estado
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+    <script>
+        $('#inputTurno').datepicker({
+            format: 'dd/mm/yyyy',
+            uiLibrary: 'bootstrap4',
+            modal: true,
+            footer: true,
+            value: new Date().toLocaleDateString('es-ES')
+        });
+        $(document).ready(function () {
+
+            $("#btnConsulta").click(e => {
+                e.preventDefault();
+                var turno = $('#inputTurno').val();
+                var unidad = $('#cbLlenadora').val();
+                //console.log(`clicked ${turno} and ${unidad}`)
+
+                var objDato = {
+                    Puesto: unidad,
+                    Fecha: turno
+                };
+
+                $.ajax({
+                    url: "/Schedule/getOrdenEnvasadosFromWS",
+                    type: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify(objDato),
+                    success: function (result) {
+                        $("#tbl > tbody").empty();
+                        console.log(result);
+
+                        $.each(result, (index, item) => {
+
+                            var turno = '';
+                            if (item.fecha == '1900-01-01T00:00:00')
+                                turno = '---';
+                            else
+                                turno = new Date(item.fecha).toLocaleDateString('es-ES');
+
+                            var lastColumn = '';
+
+                            if (item.estado == "Iniciado") {
+                                lastColumn = '<td class="table-warning">Iniciado</td>';
+                            }
+                            else if (item.estado == "Finalizado") {
+                                lastColumn = '<td class="table-success">Finalizado</td>';
+                            }
+                            else if (item.estado == "Consolidado") {
+                                lastColumn = '<td class="table-primary">Consolidado</td>';
+                            }
+                            else {
+                                lastColumn = '<td>Desconocido</td>';
+                            }
+
+                            $("#tbl > tbody:last-child").append($(`<tr><td>${item.orden}</td><td>${item.puesto}</td><td>${new Date(item.fecha).toLocaleDateString('es-ES')}</td><td>${item.productoTerminado}</td><td>${item.semielaborado}</td><td>${item.semielaborado_Descr}</td>${lastColumn}</tr>`));
+                        });
+
+
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+
+
+            });
+
+
+
+        });
+    </script>
 

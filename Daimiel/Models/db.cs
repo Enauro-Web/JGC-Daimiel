@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace Daimiel.Models
 {
@@ -115,7 +116,7 @@ namespace Daimiel.Models
                                    Semielaborado_Descr = dr.ItemArray[8].ToString(),
                                    Grado_Brix_VALOR_TEO = (float)Convert.ChangeType(dr.ItemArray[9],typeof(float)),
                                    Temperatura_Pasteriz = (float)Convert.ChangeType(dr.ItemArray[10], typeof(float)),
-                                   Temperatura_Llenado = (float)Convert.ChangeType(dr.ItemArray[11], typeof(float))
+                                   Temperatura_Llenado = (float)Convert.ChangeType(dr.ItemArray[11], typeof(float)),                                  
                                }).ToList();
                 }
                 catch(Exception error)
@@ -348,6 +349,156 @@ namespace Daimiel.Models
             }//End of using
 
             return llenadoraInfo;
+        }
+        public int AddOrdenEnvasado(List<OrdenEnvasado> ordenes)
+        {
+            int result = 0;
+
+            using (cn)
+            {
+
+                try
+                {
+                    cn.Open();
+
+                    /*
+                    SqlParameter param1 = new SqlParameter("@pPuesto", null);
+                    SqlParameter param2 = new SqlParameter("@pPuesto_Denominacion", null);
+                    SqlParameter param3 = new SqlParameter("@pOrden", null);
+                    SqlParameter param4 = new SqlParameter("@pMaterial", null);
+                    SqlParameter param5 = new SqlParameter("@pProductoTerminado", null);
+                    SqlParameter param6 = new SqlParameter("@pProductoTerminado_Denominacion", null);
+                    SqlParameter param7 = new SqlParameter("@pSemielaborado", null);
+                    SqlParameter param8 = new SqlParameter("@pSemielaborado_Descr", null);
+                    SqlParameter param9 = new SqlParameter("@pGrado_Brix_VALOR_TEO", null);
+                    SqlParameter param10 = new SqlParameter("@pTemperatura_Pasteriz", null);
+                    SqlParameter param11 = new SqlParameter("@pTemperatura_Llenado", null);
+                    SqlParameter param12 = new SqlParameter("@pFecha", null);
+                    */
+
+                    foreach (OrdenEnvasado orden in ordenes)
+                    {
+                        SqlCommand cmd = new SqlCommand("sp_I_AddOrdenEnvasado", cn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.AddWithValue("@pPuesto", orden.Puesto);
+                        cmd.Parameters.AddWithValue("@pPuesto_Denominacion", orden.Puesto_Denominacion);
+                        cmd.Parameters.AddWithValue("@pOrden", orden.Orden);
+                        cmd.Parameters.AddWithValue("@pMaterial", orden.Material);
+                        cmd.Parameters.AddWithValue("@pProductoTerminado", orden.ProductoTerminado);
+                        cmd.Parameters.AddWithValue("@pProductoTerminado_Denominacion", orden.ProductoTerminado_Denominacion);
+                        cmd.Parameters.AddWithValue("@pSemielaborado", orden.Semielaborado);
+                        cmd.Parameters.AddWithValue("@pSemielaborado_Descr", orden.Semielaborado_Descr);
+                        cmd.Parameters.AddWithValue("@pGrado_Brix_VALOR_TEO", orden.Grado_Brix_VALOR_TEO);
+                        cmd.Parameters.AddWithValue("@pTemperatura_Pasteriz", orden.Temperatura_Pasteriz);
+                        cmd.Parameters.AddWithValue("@pTemperatura_Llenado", orden.Temperatura_Llenado);
+                        cmd.Parameters.AddWithValue("@pFecha", orden.Fecha);                       
+
+                        cmd.ExecuteNonQuery();
+
+                        cmd.Dispose();
+
+                    }
+
+                }
+                catch(Exception error)
+                {
+                    var ErrorMsg = error.Message;
+                    result = -1;
+                }               
+
+            }
+                return result;
+        }
+
+        public List<OrdenEnvasado> GetOrdenEnvasadosFromWS(DateTime fecha, string llenadora)
+        {
+            List<OrdenEnvasado> ordenes = new List<OrdenEnvasado>();
+
+            /*var data = @"{""results"": [{""NumeroOrden"": ""1989351"",""Codigo"": ""17755"",""Semielaborado"": ""54191"",""Lote"": ""K050"",""Descripcion"": ""REF.SMOOT.PIÑA-PLAT-COC TESCO PET750MLX6"",
+                                        ""DescripcionSemielaborado"": ""SMOOTHIE PIÑA PLATANO COCO (ALDI)"",""Fecha"": ""20201105"",""Cantidad"": """"},
+                                        {""NumeroOrden"": ""1987158"",""Codigo"": ""16741"",""Semielaborado"": ""54191"",""Lote"": ""K050"",""Descripcion"": ""SMOOT JUICE CO TROPICAL PET750MLX6PROD2"",
+                                        ""DescripcionSemielaborado"": ""SMOOTHIE PIÑA PLATANO COCO (ALDI)"",""Fecha"": ""20201105"",""Cantidad"": """"}
+                        ]}";*/
+
+            /* Obtener el código de la llenadora a partir del nombre */
+
+            using (cn)
+            {
+                SqlCommand cmd = new SqlCommand("SELECT TOP 1 Codigo FROM Unidades WHERE Unidad = @unidad", cn);
+                cmd.Parameters.AddWithValue("@unidad", llenadora);
+                try
+                {
+                    cn.Open();
+                    var result = cmd.ExecuteScalar();
+                }
+                catch(Exception error)
+                {
+                    var errorMsg = error.Message;
+                }
+            }
+
+            var data = File.ReadAllText(@"C:\Users\ESORTIZPOSTR\source\repos\JGC\Daimiel\Models\Json\10000831.json");
+
+            JsonOrdenesRoot jsonOrdenes = JsonConvert.DeserializeObject<JsonOrdenesRoot>(data);
+
+            ordenes = (from JsonOrden jsonOrden in jsonOrdenes.d.results
+                       select new OrdenEnvasado()
+                       {
+                           Puesto = llenadora,
+                           Puesto_Denominacion = "",
+                           Orden = jsonOrden.NumeroOrden == "" ? 0 : Convert.ToInt32(jsonOrden.NumeroOrden),
+                           Material = 0,
+                           ProductoTerminado = jsonOrden.Descripcion,
+                           ProductoTerminado_Denominacion = jsonOrden.Descripcion,
+                           Semielaborado = jsonOrden.Semielaborado == "" ? 0 : Convert.ToInt32(jsonOrden.Semielaborado),
+                           Semielaborado_Descr = jsonOrden.DescripcionSemielaborado,
+                           Grado_Brix_VALOR_TEO = 0,
+                           Temperatura_Pasteriz = 0,
+                           Temperatura_Llenado = 0,
+                           Fecha = fecha
+                       }).ToList();
+
+
+
+            return ordenes;
+        }
+        public List<Unidad> GetListUnidades(string clase, int? codigo)
+        {
+            List<Unidad> unidades = new List<Unidad>();
+
+            using (cn)
+            {
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Unidades WHERE Clase = @clase", cn);
+                cmd.Parameters.AddWithValue("@clase", clase);
+                try
+                {
+                    cn.Open();
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    unidades = (from DataRow dr in dt.Rows
+                                select new Unidad()
+                                {
+                                    unidad = dr.ItemArray[1] is DBNull ? "" : dr.ItemArray[1].ToString(),
+                                    clase = dr.ItemArray[2] is DBNull ? "" : dr.ItemArray[2].ToString(),
+                                    descripcion = dr.ItemArray[3] is DBNull ? "" : dr.ItemArray[3].ToString(),
+                                    codigo = dr.ItemArray[4] is DBNull ? 0 : Convert.ToInt32(dr.ItemArray[4]),
+                                    centro = dr.ItemArray[5] is DBNull ? 0 : Convert.ToInt32(dr.ItemArray[5])
+                                }
+                                ).ToList();
+                    
+                }
+                catch (Exception error)
+                {
+                    var errorMsg = error.Message;
+                }
+            }
+
+
+            return unidades;
+
         }
 
     }
